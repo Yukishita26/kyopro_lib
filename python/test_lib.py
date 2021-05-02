@@ -83,5 +83,19 @@ class TestTreeDiamiter(unittest.TestCase):
 15 31
 """), 8)
 
+class TestBinsearch(unittest.TestCase):
+    def testBinsearch(self):
+        ls = [0, 1, 3, 3, 4, 6, 8, 10]
+        self.assertEqual(lib.binsearch(lambda x:ls[x]>=1, -1, 8), 1)
+        self.assertEqual(lib.binsearch(lambda x:ls[x]>=2, -1, 8), 2)
+        self.assertEqual(lib.binsearch(lambda x:ls[x]>=3, -1, 8), 2)
+        self.assertEqual(lib.binsearch(lambda x:ls[x]>=4, -1, 8), 4)
+    def testBinsearchList(self):
+        ls = [0, 1, 3, 3, 4, 6, 8, 10]
+        self.assertEqual(lib.binsearch_list_left(ls, 1), 1)
+        self.assertEqual(lib.binsearch_list_left(ls, 2), 2)
+        self.assertEqual(lib.binsearch_list_left(ls, 3), 2)
+        self.assertEqual(lib.binsearch_list_left(ls, 4), 4)
+
 if __name__ == '__main__':
     unittest.main()

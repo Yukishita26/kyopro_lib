@@ -45,3 +45,19 @@ def tree_diameter(graph):
     nodel, _ = bfs_depth(graph, 1)
     _node, r = bfs_depth(graph, nodel)
     return r
+
+# めぐる式二分探索
+# func: x:int -> bool
+# left < x < right で func(x)=True となる最小のxを探索
+def binsearch(func, left, right):
+  while left+1<right:
+    mid = left + (right - left)//2
+    if func(mid):
+      right = mid
+    else:
+      left = mid
+  return right
+
+# 昇順に挿入できるindex
+def binsearch_list_left(lst, x):
+    return binsearch(lambda i:lst[i]>=x, -1, len(lst))
