@@ -143,6 +143,8 @@ class Permutation:
         return cls(list(range(n)))
 
 class HashableIntSet:
+    class SubstitutionError(Exception):
+        pass
     def __init__(self, s):
         if type(s)==set:
             sm = 0
@@ -162,8 +164,6 @@ class HashableIntSet:
         return self._hash
     @hash.setter
     def hash(self, value):
-        class SubstitutionError(Exception):
-            pass
         raise SubstitutionError("hash can't be changed")
 
     def __hash__(self):
@@ -221,6 +221,7 @@ class HashableIntSet:
         return str(self.toSet())
     def __repr__(self):
         return f"HashableIntSet({self.toSet()})"
+    # TODO
     def __xor__(self, other):
         pass
     def __le__(self, other):
@@ -234,3 +235,86 @@ class HashableIntSet:
     @classmethod
     def EmptySet(cls):
         return cls(set())
+
+class ModInt:
+    default_mod = 10**9 + 7
+    class SubstitutionError(Exception):
+        pass
+    def __init__(self, n, mod=None):
+        if mod is None:
+            mod = self.default_mod
+        self._mod = mod
+        self._n = n.n if isinstance(n, ModInt) else n % mod
+    
+    @property
+    def mod(self):
+        return self._mod
+    @mod.setter
+    def mod(self, value):        
+        raise self.SubstitutionError("cannot assign to ModInt property")
+    
+    @property
+    def n(self):
+        return self._n
+    @n.setter
+    def n(self, value):
+        raise self.SubstitutionError("cannot assign to ModInt property")
+
+    def __eq__(self, other):
+        if not(isinstance(other, ModInt)):
+            return False
+        return self.mod == other.mod and self.n == other.n
+    def __add__(self, other):
+        if isinstance(other, ModInt): other=other.n
+        return ModInt(self.n + other, self.mod)
+    __radd__=__add__
+    def __sub__(self, other):
+        if isinstance(other, ModInt): other=other.n
+        return ModInt(self.n - other, self.mod)
+    def __rsub__(self, other):
+        if isinstance(other, ModInt): other=other.n
+        return ModInt(other - self.n, self.mod)
+    def __mul__(self, other):
+        if isinstance(other, ModInt): other=other.n
+        return ModInt(self.n * other, self.mod)
+    __rmul__=__mul__
+    def __pow__(self, p: int):
+        """
+        if p==0:
+            return ModInt(1, self.mod)
+        m = self.__pow__(p//2)
+        if p%2==0:
+            return m * m
+        else:
+            return self * m * m
+        """
+        return ModInt(pow(self.n, p, mod=self.mod))
+    def inv(self):
+        return ModInt(pow(self.n, -1, mod=self.mod))
+        #return self ** (self.mod - 2)
+    def __truediv__(self, other):
+        if isinstance(other, int): other=ModInt(other)
+        return self * other.inv()
+    def __rtruediv__(self, other):
+        if isinstance(other, int): other=ModInt(other)
+        return other * self.inv()
+    def __str__(self):
+        return str(self.n)
+    def __repr__(self):
+        return f"ModInt({self.n}, {self.mod})"
+    @classmethod
+    def comb(cls, n, k, mod=default_mod):
+        if isinstance(k, cls):
+            mod = k.mod
+            k = k.n
+        if isinstance(n, cls):
+            mod = n.mod
+            n = n.n
+        k = min(k, n-k)
+        nf = ModInt(1, mod)
+        for i in range(n-k+1, n+1):
+            nf *= i
+        kf = ModInt(1, mod)
+        for i in range(1,k+1):
+            kf *= i
+        return nf / kf

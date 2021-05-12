@@ -172,5 +172,57 @@ class TestHashableIntSet(unittest.TestCase):
         s = lib.HashableIntSet({0, 2})
         self.assertEqual(s.toSet(), {0, 2})
 
+class TestModInt(unittest.TestCase):
+    def testEq(self):
+        mod = 10**9 + 7
+        a = lib.ModInt(5)
+        b = lib.ModInt(5 + mod)
+        self.assertEqual(a, b)
+        c = lib.ModInt(5, 107)
+        d = lib.ModInt(5 + 107 * 1234, 107)
+        self.assertEqual(c, d)
+    def testAdd(self):
+        #mod = 10**9 + 7
+        a = lib.ModInt(5)
+        b = lib.ModInt(3)
+        self.assertEqual(a + b, lib.ModInt(8))
+        self.assertEqual(a + 3, lib.ModInt(8))
+        self.assertEqual(5 + b, lib.ModInt(8))
+    def testMul(self):
+        #mod = 10**9 + 7
+        a = lib.ModInt(5)
+        b = lib.ModInt(3)
+        self.assertEqual(a * b, lib.ModInt(15))
+        self.assertEqual(a * 3, lib.ModInt(15))
+        self.assertEqual(5 * b, lib.ModInt(15))
+    def testSub(self):
+        mod = 10**9 + 7
+        a = lib.ModInt(5)
+        b = lib.ModInt(3)
+        self.assertEqual(a - b, lib.ModInt(2))
+        self.assertEqual(a - 3, lib.ModInt(2))
+        self.assertEqual(5 - b, lib.ModInt(2))
+        self.assertEqual(b - a, lib.ModInt(mod - 2))
+    def testDiv(self):
+        a = lib.ModInt(12)
+        b = lib.ModInt(5)
+        self.assertEqual(a / 3, lib.ModInt(4))
+        self.assertEqual(24 / a, lib.ModInt(2))
+        self.assertEqual(1 / b, lib.ModInt(400000003))
+    def testPow(self):
+        a = lib.ModInt(3)
+        self.assertEqual(a ** 123, lib.ModInt(3 ** 123)) # 950574363
+    def testString(self):
+        a = lib.ModInt(3)
+        b = lib.ModInt(3, 107)
+        self.assertEqual(str(a), "3")
+        self.assertEqual(str(b), "3")
+        self.assertEqual(repr(a), "ModInt(3, 1000000007)")
+        self.assertEqual(repr(b), "ModInt(3, 107)")
+    def testComb(self):
+        self.assertEqual(lib.ModInt.comb(5, 3).n, 10)
+        self.assertEqual(lib.ModInt.comb(1003, 50).n, 55229169)
+        self.assertEqual(lib.ModInt.comb(103, 5, mod=10**7+7).n, 7541189)
+
 if __name__ == '__main__':
     unittest.main()
