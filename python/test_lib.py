@@ -97,5 +97,31 @@ class TestBinsearch(unittest.TestCase):
         self.assertEqual(lib.binsearch_list_left(ls, 3), 2)
         self.assertEqual(lib.binsearch_list_left(ls, 4), 4)
 
+class TestPermutation(unittest.TestCase):
+    Id = lib.Permutation.Id(3)
+    sigma = lib.Permutation([1,2,0])
+    tau = lib.Permutation([0,2,1])
+    rand = lib.Permutation([1,4,2,6,3,5,0])
+
+    def testSize(self):
+        self.assertEqual(self.sigma.size(), 3)
+        self.assertNotEqual(self.rand.size(), 5)
+    def testApply(self):
+        self.assertEqual(self.sigma.apply(0), 1)
+        self.assertEqual(self.sigma.apply(1), 2)
+        self.assertEqual(self.sigma.apply(2), 0)
+    def testMul(self):
+        self.assertEqual(self.tau * self.tau, self.Id)
+    def testPow(self):
+        self.assertEqual(self.sigma ** 3, self.Id)
+    def testOrder(self):
+        self.assertEqual(self.Id.order(), 1)
+        self.assertEqual(self.tau.order(), 2)
+        self.assertEqual(self.sigma.order(), 3)
+    def testSign(self):
+        self.assertEqual(self.Id.sign(), 1)
+        self.assertEqual(self.sigma.sign(), 1)
+        self.assertEqual(self.tau.sign(), -1)
+
 if __name__ == '__main__':
     unittest.main()
