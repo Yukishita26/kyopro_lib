@@ -123,5 +123,54 @@ class TestPermutation(unittest.TestCase):
         self.assertEqual(self.sigma.sign(), 1)
         self.assertEqual(self.tau.sign(), -1)
 
+class TestHashableIntSet(unittest.TestCase):
+    def testEquivalence(self):
+        s1 = lib.HashableIntSet(5)
+        s2 = lib.HashableIntSet({0, 2})
+        self.assertEqual(str(s1), "{0, 2}")
+        self.assertEqual(str(s2), "{0, 2}")
+        self.assertEqual(s1, s2)
+    def testLength(self):
+        s = lib.HashableIntSet({0, 2})
+        self.assertEqual(len(s), 2)
+    def testContain(self):
+        s = lib.HashableIntSet({0, 2})
+        self.assertIn(0, s)
+        self.assertNotIn(1, s)
+        self.assertIn(2, s)
+    def testAdd(self):
+        s = lib.HashableIntSet({0, 2})
+        s = s | {4}
+        self.assertEqual(s, lib.HashableIntSet({0, 2, 4}))
+        s |= {6}
+        self.assertEqual(s, lib.HashableIntSet({0, 2, 4, 6}))
+        s += 3
+        self.assertEqual(s, lib.HashableIntSet({0, 2, 3, 4, 6}))
+    def testOr(self):
+        s = lib.HashableIntSet({0, 2})
+        t = lib.HashableIntSet({2, 4})
+        self.assertEqual(s | t, lib.HashableIntSet({0, 2, 4}))
+        s |= t
+        self.assertEqual(s, lib.HashableIntSet({0, 2, 4}))
+    def testAnd(self):
+        s = lib.HashableIntSet({0, 2})
+        t = lib.HashableIntSet({2, 4})
+        self.assertEqual(s & t, lib.HashableIntSet({2}))
+        s &= t
+        self.assertEqual(s, lib.HashableIntSet({2}))
+    def testSub(self):
+        s = lib.HashableIntSet({0, 2, 4})
+        s = s - {4}
+        self.assertEqual(s, lib.HashableIntSet({0, 2}))
+        s = s - {3}
+        self.assertEqual(s, lib.HashableIntSet({0, 2}))
+        s = s - 2
+        self.assertEqual(s, lib.HashableIntSet({0}))
+        s -= 0
+        self.assertEqual(s, lib.HashableIntSet(set()))
+    def testToSet(self):
+        s = lib.HashableIntSet({0, 2})
+        self.assertEqual(s.toSet(), {0, 2})
+
 if __name__ == '__main__':
     unittest.main()

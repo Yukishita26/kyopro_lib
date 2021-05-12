@@ -141,3 +141,96 @@ class Permutation:
     @classmethod
     def Id(cls, n):
         return cls(list(range(n)))
+
+class HashableIntSet:
+    def __init__(self, s):
+        if type(s)==set:
+            sm = 0
+            for i in s:
+                if type(i)!=int:
+                    raise TypeError(f"HashableSet must be initialized with 'set' of 'int' or hash number, not {type(s)}")
+                sm += 1<<i
+            self._hash = sm
+        elif type(s)==int:
+            if s<0: raise ValueError("hash must be positive")
+            self._hash = s
+        else:
+            raise TypeError(f"HashableSet must be initialized with 'set' or hash number, not {type(s)}")
+    
+    @property
+    def hash(self):
+        return self._hash
+    @hash.setter
+    def hash(self, value):
+        class SubstitutionError(Exception):
+            pass
+        raise SubstitutionError("hash can't be changed")
+
+    def __hash__(self):
+        return self.hash
+    def __eq__(self, other):
+        return self.hash == other.hash
+    def __contains__(self, other):
+        if type(other)!=int:
+            raise TypeError(f"'in <HashableIntSet>' requires a integer as left operand, not {type(other)}")
+        return self.hash>>other&1 
+    def __len__(self):
+        return bin(self.hash).count("1")
+    def __add__(self, other):
+        if type(other)==int:
+            return HashableIntSet(self.hash|(1<<other))
+        else:
+            raise TypeError(f"unsupported operand type(s) for +: 'HashableIntSet' and '{type(other)}'")
+    def __or__(self, other):
+        if type(other)==set:
+            other = HashableIntSet(other)
+        if type(other)==HashableIntSet:
+            return HashableIntSet(self.hash | other.hash)
+        else:
+            raise TypeError(f"unsupported operand type(s) for |: 'HashableIntSet' and '{type(other)}'")
+    def __and__(self, other):
+        if type(other)==set:
+            other = HashableIntSet(other)
+        if type(other)==HashableIntSet:
+            return HashableIntSet(self.hash & other.hash)
+        else:
+            raise TypeError(f"unsupported operand type(s) for &: 'HashableIntSet' and '{type(other)}'")
+    def __sub__(self, other):
+        if type(other)==int:
+            return HashableIntSet(self.hash^(1<<other)&self.hash)
+        if type(other)==HashableIntSet:
+            other = other.toSet()
+        if type(other)==set:
+            h = self.hash
+            for o in other: h = h^(1<<o)&h
+            return HashableIntSet(h)
+        else:
+            raise TypeError(f"unsupported operand type(s) for -: 'HashableIntSet' and '{type(other)}'")
+    def __iter__(self):
+        return iter(self.toSet())
+    def toSet(self):
+        s = set()
+        h = self.hash
+        i = 0
+        while h>0:
+            if h&1: s.add(i)
+            h >>= 1
+            i += 1
+        return s
+    def __str__(self):
+        return str(self.toSet())
+    def __repr__(self):
+        return f"HashableIntSet({self.toSet()})"
+    def __xor__(self, other):
+        pass
+    def __le__(self, other):
+        pass
+    def __ge__(self, other):
+        pass
+    def __lt__(self, other):
+        pass
+    def __gt__(self, other):
+        pass
+    @classmethod
+    def EmptySet(cls):
+        return cls(set())
