@@ -22,6 +22,7 @@ def reppow(x, p, f):
     else:
         return f(x, f(r, r))
 
+# UnionFindTree
 class UnionFindTree:
     def __init__(self, n):
         self._tree = [i for i in range(n)]
@@ -44,7 +45,6 @@ class UnionFindTree:
                 self._rank[ra] += 1
 
 from collections import deque
-
 # graph(隣接リスト), 起点node -> deepest node, depth
 def bfs_depth(graph, start: int): 
     dist = [-1] * (len(graph))
@@ -142,100 +142,7 @@ class Permutation:
     def Id(cls, n):
         return cls(list(range(n)))
 
-class HashableIntSet:
-    class SubstitutionError(Exception):
-        pass
-    def __init__(self, s):
-        if type(s)==set:
-            sm = 0
-            for i in s:
-                if type(i)!=int:
-                    raise TypeError(f"HashableSet must be initialized with 'set' of 'int' or hash number, not {type(s)}")
-                sm += 1<<i
-            self._hash = sm
-        elif type(s)==int:
-            if s<0: raise ValueError("hash must be positive")
-            self._hash = s
-        else:
-            raise TypeError(f"HashableSet must be initialized with 'set' or hash number, not {type(s)}")
-    
-    @property
-    def hash(self):
-        return self._hash
-    @hash.setter
-    def hash(self, value):
-        raise SubstitutionError("hash can't be changed")
-
-    def __hash__(self):
-        return self.hash
-    def __eq__(self, other):
-        return self.hash == other.hash
-    def __contains__(self, other):
-        if type(other)!=int:
-            raise TypeError(f"'in <HashableIntSet>' requires a integer as left operand, not {type(other)}")
-        return self.hash>>other&1 
-    def __len__(self):
-        return bin(self.hash).count("1")
-    def __add__(self, other):
-        if type(other)==int:
-            return HashableIntSet(self.hash|(1<<other))
-        else:
-            raise TypeError(f"unsupported operand type(s) for +: 'HashableIntSet' and '{type(other)}'")
-    def __or__(self, other):
-        if type(other)==set:
-            other = HashableIntSet(other)
-        if type(other)==HashableIntSet:
-            return HashableIntSet(self.hash | other.hash)
-        else:
-            raise TypeError(f"unsupported operand type(s) for |: 'HashableIntSet' and '{type(other)}'")
-    def __and__(self, other):
-        if type(other)==set:
-            other = HashableIntSet(other)
-        if type(other)==HashableIntSet:
-            return HashableIntSet(self.hash & other.hash)
-        else:
-            raise TypeError(f"unsupported operand type(s) for &: 'HashableIntSet' and '{type(other)}'")
-    def __sub__(self, other):
-        if type(other)==int:
-            return HashableIntSet(self.hash^(1<<other)&self.hash)
-        if type(other)==HashableIntSet:
-            other = other.toSet()
-        if type(other)==set:
-            h = self.hash
-            for o in other: h = h^(1<<o)&h
-            return HashableIntSet(h)
-        else:
-            raise TypeError(f"unsupported operand type(s) for -: 'HashableIntSet' and '{type(other)}'")
-    def __iter__(self):
-        return iter(self.toSet())
-    def toSet(self):
-        s = set()
-        h = self.hash
-        i = 0
-        while h>0:
-            if h&1: s.add(i)
-            h >>= 1
-            i += 1
-        return s
-    def __str__(self):
-        return str(self.toSet())
-    def __repr__(self):
-        return f"HashableIntSet({self.toSet()})"
-    # TODO
-    def __xor__(self, other):
-        pass
-    def __le__(self, other):
-        pass
-    def __ge__(self, other):
-        pass
-    def __lt__(self, other):
-        pass
-    def __gt__(self, other):
-        pass
-    @classmethod
-    def EmptySet(cls):
-        return cls(set())
-
+# ModInt & combination
 class ModInt:
     default_mod = 10**9 + 7
     class SubstitutionError(Exception):
@@ -318,3 +225,61 @@ class ModInt:
         for i in range(1,k+1):
             kf *= i
         return nf / kf
+
+
+from collections import deque
+
+# 強連結成分分解
+class SCC:
+  def __init__(self, graph):
+    self.graph = graph
+  def visit_dfs(self, top, depth):
+    self.visited[top] = depth
+    stack = [top]
+    while stack:
+      top = stack[-1]
+      if self.quegraph[top]:
+        nxt = self.quegraph[top].popleft()
+        if self.visited[nxt]==-1:
+          self.visited[nxt] = self.visited[top] + 1
+          stack.append(nxt)
+      else:
+        self.orders += [top]
+        stack.pop()
+  def dfs_return_order(self):
+    self.visited = [-1] * len(self.graph)
+    self.orders = []
+    self.quegraph = [deque(l) for l in self.graph]
+    for i in range(1, len(self.graph)):
+      if self.visited[i]==-1:
+        self.visit_dfs(i, 0)
+    return self.orders
+  def revisit_dfs(self, top, section):
+    self.revisited[top] = section
+    stack = [top]
+    while stack:
+      top = stack.pop()
+      for nxt in self.rev_graph[top]:
+        if self.revisited[nxt]!=-1:continue
+        self.revisited[nxt] = self.revisited[top]
+        stack.append(nxt)
+  # 強連結成分(行き帰りできる成分の組)のグループ
+  # 代表元:同じグループの頂点 のdictで返す
+  def scc(self):
+    self.rev_graph = [[] for _ in range(len(self.graph))]
+    for i in range(len(self.graph)):
+      for v in self.graph[i]:
+        self.rev_graph[v] += [i]
+    self.dfs_return_order()
+    self.revisited = [-1] * len(self.graph)
+    for i in self.orders[::-1]:
+      if self.revisited[i]==-1:
+        self.revisit_dfs(i, i)
+    scc = {}
+    for i,v in enumerate(self.revisited):
+      if v==-1:continue
+      if v in scc:
+        scc[v] += [i]
+      else:
+        scc[v] = [i]
+    return scc
