@@ -22,6 +22,27 @@ def reppow(x, p, f):
     else:
         return f(x, f(r, r))
 
+# エラトステネスの篩
+import numpy as np
+def eratosthenes(n):
+    is_prime = np.ones((n+1,), dtype=bool)
+    is_prime[:2] = False
+    for i in range(2,n+1):
+        if is_prime[i]:
+            is_prime[i*2::i]=False
+    return is_prime
+
+# for PyPy
+def eratosthenes_plain(n):
+    is_prime = [True] * (n+1)
+    is_prime[0] = False
+    is_prime[1] = False
+    for i in range(2,n+1):
+        if is_prime[i]:
+            for k in range(i*2, n+1, i):
+                is_prime[k] = False
+    return is_prime
+
 # UnionFindTree
 class UnionFindTree:
     def __init__(self, n):

@@ -1,6 +1,40 @@
 import lib
 import unittest
 
+import numpy as np
+class TestEratosthenes(unittest.TestCase):
+    def test_numpy(self):
+        self.assertEqual(lib.eratosthenes(100).tolist(),
+            [False, False,  True,  True, False,  True, False,  True, False,
+                False, False,  True, False,  True, False, False, False,  True,
+                False,  True, False, False, False,  True, False, False, False,
+                False, False,  True, False,  True, False, False, False, False,
+                False,  True, False, False, False,  True, False,  True, False,
+                False, False,  True, False, False, False, False, False,  True,
+                False, False, False, False, False,  True, False,  True, False,
+                False, False, False, False,  True, False, False, False,  True,
+                False,  True, False, False, False, False, False,  True, False,
+                False, False,  True, False, False, False, False, False,  True,
+                False, False, False, False, False, False, False,  True, False,
+                False, False])
+        self.assertEqual(np.arange(0,101,1)[lib.eratosthenes(100)].tolist(),
+            [ 2,  3,  5,  7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
+                61, 67, 71, 73, 79, 83, 89, 97])
+    def test_plain(self):
+        self.assertEqual(lib.eratosthenes_plain(100),
+            [False, False,  True,  True, False,  True, False,  True, False,
+                False, False,  True, False,  True, False, False, False,  True,
+                False,  True, False, False, False,  True, False, False, False,
+                False, False,  True, False,  True, False, False, False, False,
+                False,  True, False, False, False,  True, False,  True, False,
+                False, False,  True, False, False, False, False, False,  True,
+                False, False, False, False, False,  True, False,  True, False,
+                False, False, False, False,  True, False, False, False,  True,
+                False,  True, False, False, False, False, False,  True, False,
+                False, False,  True, False, False, False, False, False,  True,
+                False, False, False, False, False, False, False,  True, False,
+                False, False])
+
 class TestUFT(unittest.TestCase):
     def testUnite(self):
         uft = lib.UnionFindTree(5)
